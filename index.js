@@ -2,8 +2,9 @@
 import inquirer from "inquirer"
 import mysql from "mysql2"
 import cTable from "console.table"
+import express from 'express'
 // import questions from './assets/questions/questions'
-
+// npm
 const startQuestion = {
     type: "list",
     name: "todo",
@@ -81,10 +82,10 @@ const startQuestion = {
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "driedapricot",
+  password: "12345678",
   database: "myCompany",
 })
-
+ 
 //inquirer questions
 // starts the interaction with user
 
@@ -208,11 +209,12 @@ async function addRole(){
 
   const quitProgram=() =>{
       console.log('thank you! Goodbye!')
-    //   connection.query ('quit', (err, results, fields) => {
-    //     if (err) throw err
-    //     console.table(results) })
+    connection.end()
   }
 ;
+// app.listen('3000', ()=>{
+//   console.log(`server started on port 3000`)
+// })
 
 
 startProgram()
