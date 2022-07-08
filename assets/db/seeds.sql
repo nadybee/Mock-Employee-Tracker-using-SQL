@@ -6,12 +6,12 @@ VALUES ('marketing'),
         ('C-Suite');
 
 
-INSERT INTO roles (job_title, department_id, salary)
-VALUES ('CEO', 5, 10000),
-        ('CPO', 2, 8000),
-        ('CFO', 3, 8000),
-        ('Head of Growth', 4, 8000),
-        ('Head of Marketing', 1, 8000);
+INSERT INTO roles (job_title, salary, department_id)
+VALUES ('CEO', 10000, 5),
+        ('CPO', 8000, 2),
+        ('CFO', 8000, 3),
+        ('Head of Growth', 8000, 4),
+        ('Head of Marketing',8000, 1);
 
 INSERT INTO employees (first_name, last_name, job_title, department_name, salary, manager )        
 
