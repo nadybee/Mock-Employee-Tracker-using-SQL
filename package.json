@@ -20,6 +20,7 @@
   "homepage": "https://github.com/nadybee/Mock-Employee-Tracker-using-SQL#readme",
   "dependencies": {
     "console.table": "^0.10.0",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "inquirer": "^9.0.0",
     "install": "^0.13.0",
