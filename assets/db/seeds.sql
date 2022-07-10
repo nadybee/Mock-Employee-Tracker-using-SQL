@@ -1,10 +1,10 @@
 INSERT INTO department (department_name)
 VALUES ('marketing'),
-        ('Product'),
+        ('product'),
         ('development'),
         ('growth'),
         ('accounting'),
-        ('C-Suite');
+        ('c-Suite');
 
 
 INSERT INTO roles (job_title, salary, department_name, department_id)
@@ -18,8 +18,8 @@ VALUES ('CEO', 10000, 'C-Suite', 6),
 
 INSERT INTO employees (first_name, last_name, job_title, role_id, department_name, salary, manager )        
 
-   VALUES ('Jason', 'Fairbourne', 'CEO', 1, 'C-Suite', 10000, 'none'),
-         ('Natalie', 'Fairbourne', 'CPO', 2, 'Product', 8000, 'Jason Fairbourne'),
-        ('Jeremy', 'Robertson', 'CFO', 3, 'Development', 8000, 'none');
+   VALUES ('Jason', 'Fairbourne', 'CEO', 1, 'c-Suite', 10000, 'none'),
+         ('Natalie', 'Fairbourne', 'CPO', 2, 'product', 8000, 'Jason Fairbourne'),
+        ('Jeremy', 'Robertson', 'CFO', 3, 'development', 8000, 'none');
 
   

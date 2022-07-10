@@ -90,6 +90,18 @@ const askAnswer = (answers) => {
       updateEmployee();
       break;
 
+    case 'update employee manager':
+      updateManager()
+      break;  
+
+    case 'view employees by department':
+      viewByDepartment()
+      break;
+      
+     case  'delete employee' :
+       deleteEmployee()
+       break; 
+
     case 'quit':
       quitProgram();
       break;
@@ -171,7 +183,7 @@ const getDepartmentID = (answers, res) => {
     for (let i = 0; i < results.length; i++) {
      
       if (results[i].department_name === answers.department_name) {
-    console.log('test 1' + parseInt(results[i].id))
+    // console.log('test 1' + parseInt(results[i].id))
   filteredResult = parseInt(results[i].id)
     res()
     // console.log('showing filtered result ' + filteredResult)
@@ -183,6 +195,30 @@ const getDepartmentID = (answers, res) => {
 
 };
 
+const viewByDeparmentQuestions = [
+  {
+    type: 'list',
+    name: 'departments',
+    message: 'what department of employees do you want view?',
+    choices: departmentList
+  }
+]
+function viewByDepartment() {
+  return inquirer
+    .prompt(viewByDeparmentQuestions)
+    .then((answers) => {
+      connection.query(
+          `SELECT * from employees WHERE department_name in ('${answers.departments}');`,
+       
+        (err, results, fields) => {
+          if (err) throw err;
+          console.log(`\n`);
+          console.table(results)
+          startProgram();
+        }
+      );
+    })
+  }
 /** ------------------------ROLES--------------------------------------- */
 
 const showRoles = () => {
@@ -287,7 +323,6 @@ roleList.push('return to main menu')
 
 
 let filteredRole;
-
 const getRoleID = (answers, res) => {
   // console.log( 'as ' + answers.department_name)
   connection.query('SELECT * FROM roles', (err, results) => {
@@ -296,7 +331,7 @@ const getRoleID = (answers, res) => {
     for (let i = 0; i < results.length; i++) {
      
       if (results[i].job_title === answers.job_title) {
-    console.log('test 1' + parseInt(results[i].id))
+    console.log('test 1filRole ' + parseInt(results[i].id))
   filteredRole = parseInt(results[i].id)
  res()
     // console.log('showing filtered result ' + filteredResult)
@@ -359,18 +394,7 @@ const showEmployees = () => {
 };
 
 
-async function addEmployee() {
-  try {
-    const answers = await inquirer
-      .prompt(employeeQuestion);
-    await new Promise((res, rej) => getRoleID(answers, res));
-    // console.log('test 2' + filteredResult);
-    sqlAddEmployee(answers);
-    startProgram();
-  } catch (err) {
-    return console.log(err);
-  }
-}
+
 
 
 const getEmployeeList = () => {
@@ -390,6 +414,19 @@ const getEmployeeList = () => {
   return employees;
 };
 const employeeList = getEmployeeList();
+
+async function addEmployee() {
+  try {
+    const answers = await inquirer
+      .prompt(employeeQuestion);
+    await new Promise((res, rej) => getRoleID(answers, res));
+    // console.log('test 2' + filteredResult);
+    sqlAddEmployee(answers);
+    startProgram();
+  } catch (err) {
+    return console.log(err);
+  }
+}
 
 const UpdateEmployeeQuestion = [
   {
@@ -427,10 +464,10 @@ const getEmployeeID = (answers, res) => {
     for (let i = 0; i < results.length; i++) {
      
       if (`${results[i].first_name} ${results[i].last_name}` === answers.update) {
-    console.log('test 1' + parseInt(results[i].id))
+    console.log('test 1forEmID' + parseInt(results[i].id))
   filteredEmployee = parseInt(results[i].id)
  res()
-    // console.log('showing filtered result ' + filteredResult)
+    // console.log('showing filtered result ' + filteredEmployee)
       }
     }
 
@@ -464,13 +501,57 @@ async function updateEmployee() {
     const answers = await inquirer
       .prompt(UpdateEmployeeQuestion);
     await new Promise((res, rej) => getEmployeeID(answers, res));
-    console.log('test 2' + filteredResult);
+    console.log('test 2' + filteredEmployee);
     sqlUpdateEmployee(answers);
     startProgram();
   } catch (err) {
     return console.log(err);
   }
 }
+
+/** ---------------MANAGER-------------------- */
+
+const updateManagerQuestions =[
+  {
+    type: 'list',
+    name: 'employee',
+    message: 'who would like to update',
+    choices: employeeList
+  },
+  {
+    type: 'input',
+    name: 'manager',
+    message: 'who is their manager?'
+  }
+]
+
+const sqlUpdateManager= (answers) =>  {
+  if (`${answers.employee}` ==='return to main menu') {
+    startProgram()
+  }
+  else{ 
+
+  connection.query(
+
+    `UPDATE EMPLOYEES
+      SET manager = '${answers.manager}'
+      WHERE id = ${filteredEmployee} `,
+    (err, results, fields) => {
+      if (err) throw err;
+      console.log(`\n`);
+    }
+  );
+};
+}
+async function updateManager() {
+ 
+    const answers = await inquirer
+      .prompt(updateManagerQuestions);
+      await new Promise((res, rej) => getEmployeeID(answers, res));
+    sqlUpdateManager(answers);
+    startProgram();
+    res()
+  }
 
 
 
