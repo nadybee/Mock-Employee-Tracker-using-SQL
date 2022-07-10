@@ -2,22 +2,14 @@ import figlet from "figlet"
 import inquirer from "inquirer"
 import mysql from "mysql2"
 import Ctable from "console.table"
-// import connection from './assets/db/connection'
-// const connection = require('./assets/db/connection.js')
 
-// const PORT = process.env.PORT || 3001
-// const app = express()
-
-//Express middleware
-// app.use(express.urlencoded({ extended: false }))
-// app.use(express.json())
 
 /*------------------CREATE CONNECTION---------------------*/
 
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-
+  password: 'driedapricot',
   database: "myCompany"
 })
 
@@ -127,7 +119,7 @@ SELECT * FROM department
     startProgram()
   })
 }
-let departmentList;
+
 function addDepartment() {
   return inquirer
     .prompt(departmentQuestion)
@@ -149,15 +141,15 @@ function addDepartment() {
   
  
 }
-
+let departmentList;
 const getDepartmentList = () => {
   let departments = []
 
  connection.query("SELECT * FROM department", (err,results)=>{ 
    
     if (err) throw err
-    console.log('frist try')
-    console.log(results)
+    // console.log('frist try')
+    // console.log(results)
  
     for (let i = 0; i < results.length; i++) {
 
@@ -165,16 +157,18 @@ const getDepartmentList = () => {
       departments.push(department)
     }
     
-    console.log('outside forloipp')
-    console.log(departments)
+    // console.log('outside forloipp')
+    // console.log(departments)
 
   })
-  console.log('outside query')
-  console.log(departments)
+  // console.log('outside query')
+  // console.log(departments)
 return departments
 }
 
+departmentList = getDepartmentList()
 
+let filteredResult;
 const getDepartmentID = (answers, res) => {
   // console.log( 'as ' + answers.department_name)
   connection.query("SELECT * FROM department", (err, results) => {
@@ -229,8 +223,10 @@ const showRoles = () => {
     startProgram()
   })
 }
-
-const RoleQuestion = [
+let roleQuestion;
+const getRoleQuestions = () =>{
+  departmentList = getDepartmentList()
+ roleQuestion = [
   {
     type: "input",
     name: "job_title",
@@ -264,7 +260,8 @@ const RoleQuestion = [
     choices: departmentList
   },
 ]
-
+return roleQuestion
+}
 const sqlAddRole = (answers) => {
   connection.query(
     `INSERT INTO roles (job_title, salary, department_name, department_id )
@@ -279,10 +276,10 @@ const sqlAddRole = (answers) => {
 async function addRole() {
 
 // console.log(getDepartmentList())
-console.log(departmentList)
+// console.log(departmentList)
   try {
 
-    const answers = await inquirer.prompt(RoleQuestion)
+    const answers = await inquirer.prompt(getRoleQuestions())
     await new Promise((res, rej) => getDepartmentID(answers, res))
     console.log("test 2" + filteredResult)
     sqlAddRole(answers)
@@ -291,7 +288,7 @@ console.log(departmentList)
     return console.log(err)
   }
 }
-
+let roleList;
 const getRoleList = () => {
   let roles = []
 
@@ -304,7 +301,7 @@ const getRoleList = () => {
   })
   return roles
 }
-const roleList = getRoleList()
+
 
 let filteredRole
 const getRoleID = (answers, res) => {
@@ -317,13 +314,17 @@ const getRoleID = (answers, res) => {
         console.log("test 1filRole " + parseInt(results[i].id))
         filteredRole = parseInt(results[i].id)
         res()
-        // console.log('showing filtered result ' + filteredResult)
+        
       }
     }
   })
 }
 
 /**---------------------------EMPLOYEE--------------------------------- */
+let employeeQuestion;
+const getEmployeeQuestions =()=>{
+  departmentList = getDepartmentList()
+  roleList =getRoleList()
 const employeeQuestion = [
   {
     type: "input",
@@ -358,6 +359,8 @@ const employeeQuestion = [
     message: "Who is their manager?",
   },
 ]
+return employeeQuestion
+}
 
 const showEmployees = () => {
   let seeEmployees = `
@@ -391,7 +394,7 @@ const employeeList = getEmployeeList()
 
 async function addEmployee() {
   try {
-    const answers = await inquirer.prompt(employeeQuestion)
+    const answers = await inquirer.prompt(getEmployeeQuestions())
     await new Promise((res, rej) => getRoleID(answers, res))
     // console.log('test 2' + filteredResult);
     sqlAddEmployee(answers)
@@ -563,14 +566,6 @@ const quitProgram = () => {
   connection.end()
 }
 
-// Default response for any other request (Not Found)
-// app.use((req, res) => {
-//   res.status(404).end()
-// })
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`)
-// })
 
 /**-----------TERMINAL ART-------------------- */
 async function begin() {
@@ -590,4 +585,4 @@ async function begin() {
 
 begin()
 
-// startProgram()
+
