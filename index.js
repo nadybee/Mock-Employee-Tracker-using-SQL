@@ -8,7 +8,9 @@ import Ctable from "console.table"
 
 const connection = mysql.createConnection({
   host: "localhost",
+  //add your username here
   user: "root",
+  //add your password here
   password: 'driedapricot',
   database: "myCompany"
 })
@@ -34,7 +36,7 @@ const startQuestion = {
     "quit",
   ],
 }
-
+//starts the questioning
 async function startProgram() {
   return await inquirer
     .prompt(startQuestion)
@@ -45,6 +47,7 @@ async function startProgram() {
     .catch((err) => console.log(err))
 }
 
+//will run the function according to answer
 const askAnswer = (answers) => {
   switch (answers.todo) {
     case "view all departments":
@@ -116,7 +119,7 @@ const departmentQuestion = {
     }
   },
 }
-
+//displays department table
 function showDepartment() {
   let seeDepartment = `
 SELECT * FROM department
@@ -129,7 +132,7 @@ SELECT * FROM department
     startProgram()
   })
 }
-
+//adds a department to table
 function addDepartment() {
   return inquirer
     .prompt(departmentQuestion)
@@ -151,6 +154,7 @@ function addDepartment() {
   
  
 }
+//gets a list of departments to use as choices
 let departmentList;
 const getDepartmentList = () => {
   let departments = []
@@ -172,6 +176,7 @@ return departments
 
 departmentList = getDepartmentList()
 
+//gets department id to be used for populate sql query
 let filteredResult;
 const getDepartmentID = (answers, res) => {
   // console.log( 'as ' + answers.department_name)
@@ -197,6 +202,8 @@ const viewByDeparmentQuestions = [
     choices: departmentList,
   },
 ]
+
+//to view employees by department
 function viewByDepartment() {
   return inquirer
     .prompt(viewByDeparmentQuestions)
@@ -215,7 +222,7 @@ function viewByDepartment() {
     .catch((err) => console.log(err))
 }
 /** ------------------------ROLES--------------------------------------- */
-
+//show roles table
 const showRoles = () => {
   let seeRoles = `
   SELECT * FROM roles
@@ -276,11 +283,8 @@ const sqlAddRole = (answers) => {
     }
   )
 }
-
+//add a role to table
 async function addRole() {
-
-// console.log(getDepartmentList())
-// console.log(departmentList)
   try {
 
     const answers = await inquirer.prompt(getRoleQuestions())
@@ -306,7 +310,7 @@ const getRoleList = () => {
   return roles
 }
 
-
+//get roles id's to add to employees
 let filteredRole
 const getRoleID = (answers, res) => {
   // console.log( 'as ' + answers.department_name)
@@ -364,7 +368,7 @@ const getEmployeeQuestions =()=>{
 ]
 return employeeQuestion
 }
-
+//show employee table
 const showEmployees = () => {
   let seeEmployees = `
   SELECT * FROM employees
@@ -394,6 +398,7 @@ const getEmployeeList = () => {
 }
 employeeList = getEmployeeList()
 
+//add employee to table
 async function addEmployee() {
   try {
     const answers = await inquirer.prompt(getEmployeeQuestions())
@@ -428,20 +433,6 @@ const getUpdateEmployeeQuestions = () => {
 return UpdateEmployeeQuestion
 }
 
-// let departmentBe;
-// const getDepartmentFromRole = (answers, res) => {
-//   connection.query('SELECT * FROM roles', (err,results) => {
-//     if (err) throw err
-//      for (let i = 0; i < results.length; i++) {
-//        if( results[i].job_title === answers.job_title) {
-//          console.log(results[i].department_name)
-//          departmentBe =results[i].department
-//         res()
-//        }
-//       }
-//   })
-// }
-
 
 const sqlAddEmployee = (answers) => {
 
@@ -455,7 +446,7 @@ const sqlAddEmployee = (answers) => {
   )
 }
 
-
+//get employee by id not sure I am using this one yet
 let filteredEmployee
 const getEmployeeID = (answers, res) => {
   // console.log( 'as ' + answers.department_name)
@@ -485,7 +476,7 @@ const sqlUpdateEmployee = (answers) => {
       }
     )
   }
-
+//update an employee
 async function updateEmployee() {
   try {
     const answers = await inquirer.prompt(getUpdateEmployeeQuestions())
@@ -539,7 +530,7 @@ catch (err) {
 }
 
 
-/**--------------------------delete employee-------------------- */
+/**--------------------------delete employee, department, roles-------------------- */
 const deleteEmployeeQuestion = [
   {
     type: "input",
