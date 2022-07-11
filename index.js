@@ -29,6 +29,8 @@ const startQuestion = {
     "update employee manager",
     "view employees by department",
     "delete employee",
+    "delete department",
+    "delete role",
     "quit",
   ],
 }
@@ -83,7 +85,15 @@ const askAnswer = (answers) => {
 
     case "delete employee":
       deleteEmployee()
-      break
+      break;
+    
+    case "delete department":
+        deleteDepartment()
+        break
+
+        case "delete role":
+          deleteRole()
+          break    
 
     case "quit":
       quitProgram()
@@ -148,21 +158,15 @@ const getDepartmentList = () => {
  connection.query("SELECT * FROM department", (err,results)=>{ 
    
     if (err) throw err
-    // console.log('frist try')
-    // console.log(results)
- 
+  
     for (let i = 0; i < results.length; i++) {
 
       let department = `${results[i].department_name}`
       departments.push(department)
     }
-    
-    // console.log('outside forloipp')
-    // console.log(departments)
 
   })
-  // console.log('outside query')
-  // console.log(departments)
+
 return departments
 }
 
@@ -323,9 +327,8 @@ const getRoleID = (answers, res) => {
 /**---------------------------EMPLOYEE--------------------------------- */
 let employeeQuestion;
 const getEmployeeQuestions =()=>{
-  departmentList = getDepartmentList()
   roleList =getRoleList()
-const employeeQuestion = [
+  employeeQuestion = [
   {
     type: "input",
     name: "first_name",
@@ -343,10 +346,10 @@ const employeeQuestion = [
     choices: roleList,
   },
   {
-    type: "list",
+    type: 'input',
     name: "department_name",
-    message: "What is their department?",
-    choices: departmentList,
+    message: "what is their department?"
+
   },
   {
     type: "input",
@@ -373,10 +376,9 @@ const showEmployees = () => {
     startProgram()
   })
 }
-
+let employeeList;
 const getEmployeeList = () => {
   let employees = []
-
   connection.query(
     "SELECT first_name, last_name FROM employees",
     (err, results) => {
@@ -390,12 +392,13 @@ const getEmployeeList = () => {
   )
   return employees
 }
-const employeeList = getEmployeeList()
+employeeList = getEmployeeList()
 
 async function addEmployee() {
   try {
     const answers = await inquirer.prompt(getEmployeeQuestions())
     await new Promise((res, rej) => getRoleID(answers, res))
+    // await new Promise((res, rej) => getDepartmentFromRole(answers, res))
     // console.log('test 2' + filteredResult);
     sqlAddEmployee(answers)
     startProgram()
@@ -403,8 +406,12 @@ async function addEmployee() {
     return console.log(err)
   }
 }
+let UpdateEmployeeQuestion;
+const getUpdateEmployeeQuestions = () => {
+  // employeeList =getEmployeeList()   
+  roleList = getRoleList()
 
-const UpdateEmployeeQuestion = [
+  UpdateEmployeeQuestion = [
   {
     type: "list",
     name: "update",
@@ -418,7 +425,26 @@ const UpdateEmployeeQuestion = [
     choices: roleList,
   },
 ]
+return UpdateEmployeeQuestion
+}
+
+// let departmentBe;
+// const getDepartmentFromRole = (answers, res) => {
+//   connection.query('SELECT * FROM roles', (err,results) => {
+//     if (err) throw err
+//      for (let i = 0; i < results.length; i++) {
+//        if( results[i].job_title === answers.job_title) {
+//          console.log(results[i].department_name)
+//          departmentBe =results[i].department
+//         res()
+//        }
+//       }
+//   })
+// }
+
+
 const sqlAddEmployee = (answers) => {
+
   connection.query(
     `INSERT INTO employees (first_name, last_name, job_title, role_id, department_name, salary, manager)
           VALUES ('${answers.first_name}','${answers.last_name}','${answers.job_title}', ${filteredRole}, '${answers.department_name}', '${answers.salary}', '${answers.manager}');`,
@@ -428,6 +454,7 @@ const sqlAddEmployee = (answers) => {
     }
   )
 }
+
 
 let filteredEmployee
 const getEmployeeID = (answers, res) => {
@@ -447,11 +474,7 @@ const getEmployeeID = (answers, res) => {
     }
   })
 }
-
 const sqlUpdateEmployee = (answers) => {
-  if (`${answers.updateRole}` === "return to main menu") {
-    startProgram()
-  } else {
     connection.query(
       `UPDATE EMPLOYEES
       SET job_title = '${answers.updateRole}'
@@ -462,11 +485,10 @@ const sqlUpdateEmployee = (answers) => {
       }
     )
   }
-}
 
 async function updateEmployee() {
   try {
-    const answers = await inquirer.prompt(UpdateEmployeeQuestion)
+    const answers = await inquirer.prompt(getUpdateEmployeeQuestions())
     await new Promise((res, rej) => getEmployeeID(answers, res))
     console.log("test 2" + filteredEmployee)
     sqlUpdateEmployee(answers)
@@ -480,10 +502,10 @@ async function updateEmployee() {
 
 const updateManagerQuestions = [
   {
-    type: "list",
-    name: "employee",
-    message: "who would like to update",
-    choices: employeeList,
+    type: "input",
+    name: "id",
+    message: "Who's manager do you want to update? enter their ID",
+   
   },
   {
     type: "input",
@@ -493,36 +515,38 @@ const updateManagerQuestions = [
 ]
 
 const sqlUpdateManager = (answers) => {
-  if (`${answers.employee}` === "return to main menu") {
-    startProgram()
-  } else {
+
     connection.query(
       `UPDATE EMPLOYEES
       SET manager = '${answers.manager}'
-      WHERE id = ${filteredEmployee} `,
+      WHERE id = ${answers.id} `,
       (err, results, fields) => {
         if (err) throw err
         console.log(`\n`)
       }
     )
   }
-}
+
 async function updateManager() {
-  const answers = await inquirer.prompt(updateManagerQuestions)
-  await new Promise((res, rej) => getEmployeeID(answers, res))
+ try{ const answers = await inquirer.prompt(updateManagerQuestions)
   sqlUpdateManager(answers)
   startProgram()
-  res()
+  
 }
+catch (err) {
+  return console.log(err)
+}
+}
+
 
 /**--------------------------delete employee-------------------- */
 const deleteEmployeeQuestion = [
   {
     type: "input",
-    name: "id",
+    name: "employee_id",
     message: "Enter employee id to delete them from the database",
-    validate: function (salary) {
-      if (!isNaN(salary)) {
+    validate: function (id) {
+      if (!isNaN(id)) {
         return true
       } else {
         ;("please enter valid id")
@@ -537,19 +561,62 @@ const deleteEmployeeQuestion = [
     choices: ["yes", "no"],
   },
 ]
-function deleteEmployee() {
+
+const deleteDepartmentQuestion = [
+  {
+    type: "input",
+    name: "department_id",
+    message: "Enter department_id to delete them from the database",
+    validate: function (id) {
+      if (!isNaN(id)) {
+        return true
+      } else {
+        ;("please enter valid id")
+      }
+    }
+  },
+  {
+    type: "list",
+    name: "ask",
+    message: "are you sure?",
+    choices: ["yes", "no"],
+  }
+]
+
+const deleteRoleQuestion = [
+  {
+    type: "input",
+    name: "role_id",
+    message: "Enter role_id to delete them from the database",
+    validate: function (id) {
+      if (!isNaN(id)) {
+        return true
+      } else {
+        ("please enter valid id")
+      }
+    }
+  },
+  {
+    type: "list",
+    name: "ask",
+    message: "are you sure?",
+    choices: ["yes", "no"],
+  }
+]
+
+  function deleteEmployee() {
   return inquirer
     .prompt(deleteEmployeeQuestion)
     .then((answers) => {
       if (answers.ask === "yes") {
         connection.query(
           `DELETE FROM employees
-        WHERE id = ${answers.id}
+        WHERE id = ${answers.employee_id}
        `,
           (err, results, fields) => {
             if (err) throw err
             console.log(`\n`)
-            console.log(`employee with ${answers.id} id deleted from database`)
+            console.log(`employee with ${answers.employee_id} id deleted from database`)
             startProgram()
           }
         )
@@ -557,8 +624,55 @@ function deleteEmployee() {
         startProgram()
       }
     })
-    .catch((err) => console.log(err))
+      .catch((err) => console.log(err))
 }
+
+function deleteDepartment() {
+  return inquirer
+    .prompt(deleteDepartmentQuestion)
+    .then((answers) => {
+      if (answers.ask === "yes") {
+        connection.query(
+          `DELETE FROM department
+        WHERE id = ${answers.department_id}
+       `,
+          (err, results, fields) => {
+            if (err) throw err
+            console.log(`\n`)
+            console.log(`employee with ${answers.department_id} id deleted from database`)
+            startProgram()
+          }
+        )
+      } else {
+        startProgram()
+      }
+    })
+      .catch((err) => console.log(err))
+}
+
+function deleteRole() {
+  return inquirer
+    .prompt(deleteRoleQuestion)
+    .then((answers) => {
+      if (answers.ask === "yes") {
+        connection.query(
+          `DELETE FROM roles
+        WHERE id = ${answers.role_id}
+       `,
+          (err, results, fields) => {
+            if (err) throw err
+            console.log(`\n`)
+            console.log(`employee with ${answers.role_id} id deleted from database`)
+            startProgram()
+          }
+        )
+      } else {
+        startProgram()
+      }
+    })
+      .catch((err) => console.log(err))
+}
+
 
 /**------------------------------QUIT------------------------- */
 const quitProgram = () => {
