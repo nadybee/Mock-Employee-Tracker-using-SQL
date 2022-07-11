@@ -16,7 +16,7 @@
   This app seeds a mock database called 'myCompany' and allows the user to view, add and delete from the database on the command line. It uses inquirer, and mysql.
 
   ## Usage
-  Make sure you have mysql installed. After cloning the the respository, open the terminal in 'db' to create and seed the database.  You will need to add your own password to the index.js file. Then you can use the prompts to use the application. Please view my walk through video to see how to use the application.
+  Make sure you have mysql installed. After cloning the the respository, open the terminal in 'db' to create and seed the database.  You will need to add your own password to the index.js file. Then you can use the prompts to use the application. Please view my [walk through video](https://drive.google.com/file/d/1y_MK9_28Jo6pxaQqf-VIToxE6t3lOOPK/view) to see how to use the application.
 
 
   ## Installation
